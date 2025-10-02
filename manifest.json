@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Application filler extension",
+  "version": "1.0",
+  "description": "Extension with a default side panel to fill out job applications that are short form.",
+  "icons": {
+    "16": "assets/resume-icon.jpg",
+    "128": "assets/resume-icon.jpg"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "permissions": ["sidePanel"]
+}
