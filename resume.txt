@@ -1,0 +1,40 @@
+Christine Luu
+Full-Stack Software Engineer  |  San Francisco Bay Area
+
+(925) 895-6431
+christine.e.luu@gmail.com
+LinkedIn  |  GitHub
+
+Skills (ordered by knowledge)
+JavaScript, TypeScript, React, Ruby, Ruby on Rails, TanStack Query, ElasticSearch, Docker, HTML5, CSS3, ChakraUI, SQL, PostgreSQL, Playwright, Git, Figma, Node.js, MongoDB, Express, TDD, OOP,  AWS, Webpack, Next.js, Headless Content Management System
+
+Experience
+Software Engineer
+Science Corporation, May 2024 - September 2025
+
+Engineered a custom in-house recruiting platform, fully replacing Greenhouse, by creating a dedicated repository for external candidates to apply, track their application status, and manage interview scheduling, while building an internal system to automate job postings across multiple internal teams and track applicant interview status
+Enabled fully configurable interview flows with customizable interview stages, scoring systems, and automated candidate advancement and rejection based on scoring, reducing manual intervention and increasing recruitment efficiency by 30%
+Transformed monolithic data models into modular systems with real-time flows, delivering dashboards that surfaced recruiting insights and accelerated candidate turnaround
+Ensured seamless migration from Greenhouse to the in-house system, migrating legacy data and integrated new features with minimal disruption. Post-migration, the internal team adopted the new platform, resulting in faster hiring decisions, and enhanced high quality candidate visibility
+Delivered custom accounting software and budgeting tools, enabling the finance team to set clear budgets and manage allocations more effectively
+Added support for spending authorities and budget items, enabling accurate general ledger code assignment, faster data reconciliation, and more efficient monthly, quarterly, and annual audits
+Reduced latency caused by slow active record queries by creating performant SQL queries designed to deliver highly complex calculations quickly
+Built the system to manage compliance and training for FDA regulations, enabling a clear source of truth for the business
+Implemented cryptographic code signing for training modules, ensuring integrity, preventing unauthorized modification, and successfully passing security audits
+Provided dependable engineering support: participated in on-call rotation, investigated production issues, and developed sustainable fixes with downstream impact in mind
+Deployed flexible, reusable UI components in an internal design system library, enabling consistency across repos and improving engineering velocity for teams adopting shared UI patterns
+Authored a test strategy and led adoption of Playwright for integration testing, writing a design doc to evaluate tooling and integrating tests into CI/CD pipelines — reduced release bugs and improved confidence in deployment
+Software Engineer
+Made with Lau, August 2023 - April 2024
+
+Migrated existing JavaScript website to a new website using TypeScript and Next.js, now serving the 1.4M Made With Lau fans (400k MAU)
+Developed custom UI components that match the website theme, provided the necessary functionality, and ensured a great user experience across various devices and screen sizes
+Led a spike investigating different database options for present and future functionality, which resulted in an informed decision for the team
+Education
+App Academy   |   Spring 2023  |  San Francisco, CA
+Studied computer science fundamentals and real-world applications through full-stack development
+
+Santa Clara University  |  Santa Clara, CA
+Leavey School of Business, BS of Accounting
+
+
