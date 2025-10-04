@@ -1,9 +1,4 @@
-Christine Luu
 Full-Stack Software Engineer  |  San Francisco Bay Area
-
-(925) 895-6431
-christine.e.luu@gmail.com
-LinkedIn  |  GitHub
 
 Skills (ordered by knowledge)
 JavaScript, TypeScript, React, Ruby, Ruby on Rails, TanStack Query, ElasticSearch, Docker, HTML5, CSS3, ChakraUI, SQL, PostgreSQL, Playwright, Git, Figma, Node.js, MongoDB, Express, TDD, OOP,  AWS, Webpack, Next.js, Headless Content Management System

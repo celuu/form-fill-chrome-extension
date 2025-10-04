@@ -1,17 +1,15 @@
 // injected into webpage
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === "autofill") {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.answer) {
+    console.log("Got response:", message.answer);
     const textarea = document.querySelector("textarea");
-    chrome.runtime.sendMessage(
-      { action: "generateAnswer" },
-      (response) => {
-        if (response?.answer && textarea) {
-          textarea.value = response.answer;
-        } else {
-          console.error(response?.error || "No answer received.");
-        }
-      }
-    );
+    if (textarea) textarea.value = message.answer;
+  } else if (message.error) {
+    console.error("Error from background:", message.error);
+  } else if (message.action === "autofill") {
+    const textarea = document.querySelector("textarea");
+    textarea.value = "Generating response...";
+    chrome.runtime.sendMessage({ action: "generateAnswer" });
   }
 });
