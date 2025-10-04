@@ -1,7 +1,12 @@
 // the popup logic
-document.getElementById("save").addEventListener("click", () => {
-  const resume = document.getElementById("resume").value;
-  chrome.storage.local.set({ resume }, () => {
-    alert("Resume saved!");
+
+document.getElementById("autofill").addEventListener("click", async () => {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  console.log(tab, "active tab")
+  await chrome.scripting.executeScript({
+    target: { tabId: tab.id },
+    files: ["content.js"],
   });
+
+  chrome.tabs.sendMessage(tab.id, { action: "autofill" });
 });

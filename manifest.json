@@ -10,6 +10,12 @@
       "128": "assets/resume-icon.jpg"
     }
   },
-  "permissions": ["storage"]
+  "permissions": ["storage", "activeTab", "scripting"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
 }
 
