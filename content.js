@@ -2,7 +2,6 @@
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.answer) {
-    console.log("Got response:", message.answer);
     const textarea = document.querySelector("textarea");
     if (textarea) textarea.value = message.answer;
   } else if (message.error) {
@@ -12,4 +11,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     textarea.value = "Generating response...";
     chrome.runtime.sendMessage({ action: "generateAnswer" });
   }
+});
+
+const extractJobDataFromYC = () => {
+  return document.getElementsByClassName('company-details')[0].textContent
+}
+
+const jobData = extractJobDataFromYC();
+
+chrome.runtime.sendMessage({
+  type: "JOB_DATA",
+  data: jobData
 });
