@@ -1,4 +1,7 @@
 // injected into webpage
+const extractJobDataFromYC = () => {
+  return document.getElementsByClassName("company-details")[0]?.textContent;
+};
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.answer) {
@@ -9,17 +12,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   } else if (message.action === "autofill") {
     const textarea = document.querySelector("textarea");
     textarea.value = "Generating response...";
-    chrome.runtime.sendMessage({ action: "generateAnswer" });
+    const jobData = extractJobDataFromYC();
+    chrome.runtime.sendMessage({ action: "generateAnswer", jobData: jobData, source: "yc" });
   }
 });
 
-const extractJobDataFromYC = () => {
-  return document.getElementsByClassName('company-details')[0].textContent
-}
 
-const jobData = extractJobDataFromYC();
 
-chrome.runtime.sendMessage({
-  type: "JOB_DATA",
-  data: jobData
-});
+// window.addEventListener("load", () => {
+//   const jobData = extractJobDataFromYC();
+//   chrome.runtime.sendMessage({
+//     type: "JOB_DATA",
+//     jobData: jobData,
+//     source: "yc",
+//   });
+// });
