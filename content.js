@@ -14,16 +14,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     textarea.value = "Generating response...";
     const jobData = extractJobDataFromYC();
     chrome.runtime.sendMessage({ action: "generateAnswer", jobData: jobData, source: "yc" });
-  }
+  }  else if (message.action === "general") {
+    const textarea = document.querySelector("textarea");
+    textarea.value = "Generating response...";
+    chrome.runtime.sendMessage({ action: "generateAnswer", jobData: jobData, source: "yc" });
+}
 });
-
-
-
-// window.addEventListener("load", () => {
-//   const jobData = extractJobDataFromYC();
-//   chrome.runtime.sendMessage({
-//     type: "JOB_DATA",
-//     jobData: jobData,
-//     source: "yc",
-//   });
-// });
