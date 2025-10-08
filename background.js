@@ -14,6 +14,8 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
         let systemMessage = "";
         let prompt = "";
 
+        console.log(formFields, "fields")
+        console.log(JSON.stringify(formFields, null, 2), "jsonfields");
         if (requestSource === "yc") {
           systemMessage = `
             You are a helpful assistant for writing YC job application responses.
@@ -46,6 +48,13 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
               Email: christine@example.com
               Phone: (925) 895-6431
               Location: San Francisco, CA
+              LinkedInUrl: https://www.linkedin.com/in/christineeluu/
+              Github URL: https://github.com/celuu
+              Gender: Female
+              Hispanic or Latino: No
+              protectedVeteran: No,
+              hasDisability: No,
+              legallyAllowedToWork: Yes
             Resume:
             ${resumeText}
 
@@ -68,6 +77,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
         if (requestSource === "general") {
           requestBody.response_format = { type: "json_object" };
         }
+
 
         const response = await fetch(
           "https://api.openai.com/v1/chat/completions",
