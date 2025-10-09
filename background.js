@@ -31,7 +31,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
             ${jobDescription}
           `;
         } else {
-          systemMessage = `You are a strict web form parser. Your task is to output ONLY valid JSON where each key is an input field ID and each value is the corresponding information from the applicant's resume.
+          systemMessage = `You are a strict web form parser. Your task is to output ONLY valid JSON where each key is an input field ID, or className or name and each value is the corresponding information from the applicant's resume.
 
           Rules:
           1. Use only the information explicitly provided in the resume. Do NOT make up or guess names, emails, LinkedIn URLs, or other personal details.
@@ -77,6 +77,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
         if (requestSource === "general") {
           requestBody.response_format = { type: "json_object" };
         }
+
 
 
         const response = await fetch(

@@ -5,40 +5,46 @@ const extractJobDataFromYC = () => {
 const extractHtml = () => {
   const html = document.documentElement.outerHTML;
   const parser = new DOMParser();
-  const doc = parser.parseFromString(html, "text/html");
-  doc.querySelectorAll("script, style").forEach((el) => el.remove());
-  doc.querySelectorAll("[style]").forEach((el) => el.removeAttribute("style"));
-  return doc.documentElement.outerHTML;
+  const page = parser.parseFromString(html, "text/html");
+  page.querySelectorAll("script, style").forEach((ele) => ele.remove());
+  page
+    .querySelectorAll("[style]")
+    .forEach((ele) => ele.removeAttribute("style"));
+  return page.documentElement.outerHTML;
 };
 
 const extractFormFields = () => {
   const fields = {};
-  document.querySelectorAll("input, textarea, select").forEach((el, index) => {
-    const id = el.id || el.name || `unnamed_${index}`;
-    const label = el.labels?.[0]?.innerText?.trim() || el.placeholder || "";
+  document.querySelectorAll("input, textarea").forEach((ele, index) => {
+    const id = ele.id || ele.name || `unnamed_${index}`;
+    const label = ele.labels?.[0]?.innerText?.trim() || ele.placeholder || "";
     fields[id] = {
       label,
-      type: el.type || el.tagName.toLowerCase(),
-      selector: el.id ? `#${el.id}` : el.name ? `[name="${el.name}"]` : null,
-      value: el.value || "",
+      type: ele.type || ele.tagName.toLowerCase(),
+      selector: ele.id
+        ? `#${ele.id}`
+        : ele.name
+        ? `[name="${ele.name}"]`
+        : `[name="${ele.className}"]`,
+      value: ele.value || "",
     };
   });
   return fields;
 };
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message) => {
   if (message.answer) {
     const textarea = document.querySelector("textarea");
     if (textarea) textarea.value = message.answer;
   } else if (message.error) {
-    console.error("Error from background:", message.error);
+    console.error("error", message.error);
   } else if (message.action === "autofill") {
     const textarea = document.querySelector("textarea");
-    textarea.value = "Generating response...";
+    textarea.value = "generating response...";
     const jobData = extractJobDataFromYC();
     chrome.runtime.sendMessage({
       action: "generateAnswer",
-      jobData: jobData,
+      jobData,
       source: "yc",
     });
   } else if (message.action === "general") {
@@ -55,11 +61,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log("DATA", data);
 
     if (!data || typeof data !== "object") {
-      console.error("Invalid form data:", data);
+      console.error("invalid data", data);
       return;
     }
 
-    const normalize = (str = "") => str.toLowerCase().replace(/[^a-z0-9]/g, "");
     const safeSelect = (selector) => {
       try {
         return document.querySelector(selector);
@@ -68,239 +73,46 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
     };
 
-    const setNativeChecked = (input, checked = true) => {
+    const setValue = (ele, val) => {
       try {
-        const desc = Object.getOwnPropertyDescriptor(
-          HTMLInputElement.prototype,
-          "checked"
-        );
-        if (desc && desc.set) desc.set.call(input, checked);
-        else input.checked = checked;
-      } catch {
-        input.checked = checked;
-      }
-    };
-
-    const setNativeValue = (el, val) => {
-      try {
-        const proto = Object.getPrototypeOf(el);
+        const proto = Object.getPrototypeOf(ele);
         const desc = Object.getOwnPropertyDescriptor(proto, "value");
-        if (desc && desc.set) desc.set.call(el, val);
-        else el.value = val;
+        if (desc && desc.set) desc.set.call(ele, val);
+        else ele.value = val;
       } catch {
-        el.value = val;
+        ele.value = val;
       }
     };
-
-    const clickEl = (el) => {
+    const dispatchInputChange = (ele) => {
       try {
-        el.click();
-        return true;
-      } catch {
-        try {
-          el.dispatchEvent(
-            new MouseEvent("click", {
-              bubbles: true,
-              cancelable: true,
-              view: window,
-            })
-          );
-          return true;
-        } catch {
-          return false;
-        }
-      }
-    };
-
-    const dispatchInputChange = (el) => {
-      try {
-        el.dispatchEvent(new Event("input", { bubbles: true }));
+        ele.dispatchEvent(new Event("input", { bubbles: true }));
       } catch {}
       try {
-        el.dispatchEvent(new Event("change", { bubbles: true }));
+        ele.dispatchEvent(new Event("change", { bubbles: true }));
       } catch {}
     };
 
     Object.entries(data).forEach(([key, value]) => {
-      let el =
+      if (!value) return;
+
+      const ele =
         safeSelect(`#${CSS.escape(key)}`) ||
         safeSelect(`[name="${key}"]`) ||
         safeSelect(`[id*="${key}"]`) ||
         safeSelect(`[name*="${key}"]`);
 
-      if (!el) {
-        const keyNorm = normalize(key);
-        const allCandidates = [
-          ...document.querySelectorAll(
-            "input, textarea, select, [role='radio'], [role='checkbox'], button, label"
-          ),
-        ];
-
-        if (keyNorm.includes("name")) {
-          el =
-            allCandidates.find((i) =>
-              /name|first|last/i.test(
-                i.name || i.id || i.placeholder || i.innerText || ""
-              )
-            ) || null;
-        } else if (keyNorm.includes("email")) {
-          el =
-            allCandidates.find((i) =>
-              /email/i.test(
-                i.name || i.id || i.placeholder || i.innerText || ""
-              )
-            ) || null;
-        } else if (keyNorm.includes("phone")) {
-          el =
-            allCandidates.find((i) =>
-              /phone|mobile/i.test(
-                i.name || i.id || i.placeholder || i.innerText || ""
-              )
-            ) || null;
-        }
-      }
-
-      if (!el) {
-        console.warn("⚠️ No element found for key:", key);
+      if (!ele) {
+        console.warn("no key found for", key);
         return;
       }
 
-      if (!value && value !== 0 && value !== false) {
-        return;
-      }
-
-      if (el.tagName === "SELECT") {
-        const options = [...el.options];
-        const match = options.find(
-          (opt) =>
-            normalize(opt.textContent || opt.value) === normalize(String(value))
-        );
-        if (match) el.value = match.value;
-        else el.value = value;
-        dispatchInputChange(el);
-        return;
-      }
-
-      if (el.tagName === "INPUT" && el.type === "radio" && value === "on") {
-        let success = false;
-
-        try {
-          if (!el.checked) {
-            setNativeChecked(el, true);
-            el.focus && el.focus();
-            dispatchInputChange(el);
-            el.dispatchEvent(
-              new MouseEvent("click", {
-                bubbles: true,
-                cancelable: true,
-                view: window,
-              })
-            );
-          }
-          success = el.checked === true;
-        } catch (e) {
-          success = false;
-        }
-
-        if (!success) {
-          const innerInput =
-            el.querySelector && el.querySelector('input[type="radio"]');
-          if (innerInput) {
-            setNativeChecked(innerInput, true);
-            innerInput.focus && innerInput.focus();
-            dispatchInputChange(innerInput);
-            clickEl(innerInput);
-            success = innerInput.checked === true;
-          }
-        }
-
-        if (!success) {
-          const label =
-            (el.id && document.querySelector(`label[for="${el.id}"]`)) ||
-            el.closest("label");
-          if (label) {
-            clickEl(label);
-            success =
-              el.checked === true ||
-              (el.querySelector &&
-                el.querySelector('input[type="radio"]')?.checked);
-          }
-        }
-
-        if (!success) {
-          const candidate = [
-            ...document.querySelectorAll('input[type="radio"]'),
-          ].find(
-            (r) =>
-              r.id === key ||
-              r.name === key ||
-              (r.id && r.id.includes(key)) ||
-              (r.name && r.name.includes(key))
-          );
-          if (candidate) {
-            setNativeChecked(candidate, true);
-            candidate.focus && candidate.focus();
-            dispatchInputChange(candidate);
-            clickEl(candidate);
-            success = candidate.checked === true;
-          }
-        }
-
-        if (!success) {
-          const roleRadio = [
-            ...document.querySelectorAll('[role="radio"], [aria-checked]'),
-          ].find((x) => {
-            const txt =
-              (x.innerText || "") +
-              " " +
-              (x.getAttribute("aria-label") || "") +
-              " " +
-              (x.getAttribute("data-testid") || "");
-            return normalize(txt).includes(normalize(key));
-          });
-          if (roleRadio) {
-            clickEl(roleRadio);
-            if (roleRadio.setAttribute)
-              roleRadio.setAttribute("aria-checked", "true");
-            dispatchInputChange(roleRadio);
-            success = true;
-          }
-        }
-
-        if (!success) console.warn("⚠️ Failed to set radio for key:", key);
-        return;
-      }
-
-      if (
-        el.getAttribute &&
-        (el.getAttribute("role") === "radio" ||
-          el.hasAttribute("aria-checked")) &&
-        value === "on"
-      ) {
-        const clicked = clickEl(el);
-        if (!clicked && el.setAttribute)
-          el.setAttribute("aria-checked", "true");
-        dispatchInputChange(el);
-        return;
-      }
-
-      if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
-        if (el.type === "checkbox") {
-          const desired = !!value;
-          setNativeChecked(el, desired);
-          dispatchInputChange(el);
-          return;
-        }
-
-        setNativeValue(el, String(value));
-        dispatchInputChange(el);
-        return;
-      }
-
-      if (value === "on") {
-        clickEl(el);
+      if (ele.tagName === "INPUT") {
+        setValue(ele, String(value));
+        dispatchInputChange(ele);
+      } else if (ele.tagName === "TEXTAREA") {
+        setValue(ele, String(value));
+        dispatchInputChange(ele);
       }
     });
   }
-
 });
