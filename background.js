@@ -45,16 +45,16 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
             Use the following resume, page HTML, and form fields to generate a JSON object:
             Personal Context:
               Name: Christine Luu
-              Email: christine@example.com
+              Email: christine.e.luu@gmail.com
               Phone: (925) 895-6431
               Location: San Francisco, CA
               LinkedInUrl: https://www.linkedin.com/in/christineeluu/
               Github URL: https://github.com/celuu
               Gender: Female
               Hispanic or Latino: No
-              protectedVeteran: No,
-              hasDisability: No,
-              legallyAllowedToWork: Yes
+              Protected Veteran: No,
+              Has Disability: No,
+              Legally Allowed to Work in the United States: Yes
             Resume:
             ${resumeText}
 
@@ -77,7 +77,6 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
         if (requestSource === "general") {
           requestBody.response_format = { type: "json_object" };
         }
-
 
 
         const response = await fetch(

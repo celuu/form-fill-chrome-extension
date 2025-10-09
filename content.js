@@ -25,7 +25,7 @@ const extractFormFields = () => {
         ? `#${ele.id}`
         : ele.name
         ? `[name="${ele.name}"]`
-        : `[name="${ele.className}"]`,
+        : `[class*="${ele.className}"]`,
       value: ele.value || "",
     };
   });
@@ -65,7 +65,7 @@ chrome.runtime.onMessage.addListener((message) => {
       return;
     }
 
-    const safeSelect = (selector) => {
+    const reduceSelector = (selector) => {
       try {
         return document.querySelector(selector);
       } catch {
@@ -95,11 +95,15 @@ chrome.runtime.onMessage.addListener((message) => {
     Object.entries(data).forEach(([key, value]) => {
       if (!value) return;
 
+      if (key.startsWith("christine")) {
+        console.log("we in here")
+      }
+
       const ele =
-        safeSelect(`#${CSS.escape(key)}`) ||
-        safeSelect(`[name="${key}"]`) ||
-        safeSelect(`[id*="${key}"]`) ||
-        safeSelect(`[name*="${key}"]`);
+        reduceSelector(`#${CSS.escape(key)}`) ||
+        reduceSelector(`[name="${key}"]`) ||
+        reduceSelector(`[id*="${key}"]`) ||
+        reduceSelector(`[class*="${key}"]`)
 
       if (!ele) {
         console.warn("no key found for", key);
