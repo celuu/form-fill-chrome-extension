@@ -51,6 +51,9 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
               LinkedInUrl: https://www.linkedin.com/in/christineeluu/
               Github URL: https://github.com/celuu
               Gender: Female
+              Pronouns: She her hers
+              Race: Asian
+              Preferred Location: San Francisco, CA
               Hispanic or Latino: No
               Protected Veteran: No,
               Has Disability: No,
@@ -77,6 +80,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
         if (requestSource === "general") {
           requestBody.response_format = { type: "json_object" };
         }
+
 
         const response = await fetch(
           "https://api.openai.com/v1/chat/completions",

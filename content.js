@@ -83,12 +83,31 @@ chrome.runtime.onMessage.addListener((message) => {
       }
     };
     const dispatchInputChange = (ele) => {
-      try {
+      if (!ele) return;
+
+      if (ele.type === "radio") {
+        const name = ele.name;
+        const form = ele.form || document;
+
+        if (name) {
+          const group = form.querySelectorAll(
+            `input[type="radio"][name="${name}"]`
+          );
+          group.forEach((radio) => {
+            if (radio !== ele && radio.checked) {
+              radio.checked = false;
+              radio.dispatchEvent(new Event("change", { bubbles: true }));
+            }
+          });
+        }
+
+        ele.checked = true;
         ele.dispatchEvent(new Event("input", { bubbles: true }));
-      } catch {}
-      try {
         ele.dispatchEvent(new Event("change", { bubbles: true }));
-      } catch {}
+      } else {
+        ele.dispatchEvent(new Event("input", { bubbles: true }));
+        ele.dispatchEvent(new Event("change", { bubbles: true }));
+      }
     };
 
     Object.entries(data).forEach(([key, value]) => {
@@ -96,14 +115,35 @@ chrome.runtime.onMessage.addListener((message) => {
 
       const ele =
         reduceSelector(`#${CSS.escape(key)}`) ||
-        reduceSelector(`[id*="${key}"]`)
+        reduceSelector(`[id*="${key}"]`) || 
+      reduceSelector(`[name*="${key}"]`)
 
       if (!ele) {
         console.warn("no key found for", key);
         return;
       }
 
-      if (ele.tagName === "INPUT") {
+      if (ele.type === "radio") {
+        const radios = document.querySelectorAll(
+          `input[type="radio"][name="${ele.name}"]`
+        );
+        let matched = false;
+
+        radios.forEach((radio) => {
+          const labelText =
+            radio.labels?.[0]?.innerText?.trim().toLowerCase() || "";
+          if (
+            radio.value.toLowerCase() === String(value).toLowerCase() ||
+            labelText.includes(String(value).toLowerCase())
+          ) {
+            radio.checked = true;
+            dispatchInputChange(radio);
+            matched = true;
+          }
+        });
+
+      if (!matched) console.warn(`No matching radio for "${key}" = "${value}"`);return;
+      } else if (ele.tagName === "INPUT") {
         setValue(ele, String(value));
         dispatchInputChange(ele);
       } else if (ele.tagName === "TEXTAREA") {
