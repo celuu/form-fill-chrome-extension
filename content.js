@@ -16,16 +16,15 @@ const extractHtml = () => {
 const extractFormFields = () => {
   const fields = {};
   document.querySelectorAll("input, textarea").forEach((ele, index) => {
-    const id = ele.id || ele.name || `unnamed_${index}`;
+    if (!ele.id) {
+      ele.id = `auto-id-${ele.tagName.toLowerCase()}-${index}`;
+    }
+    const id = ele.id;
     const label = ele.labels?.[0]?.innerText?.trim() || ele.placeholder || "";
     fields[id] = {
       label,
       type: ele.type || ele.tagName.toLowerCase(),
-      selector: ele.id
-        ? `#${ele.id}`
-        : ele.name
-        ? `[name="${ele.name}"]`
-        : `[class*="${ele.className}"]`,
+      selector: ele.id,
       value: ele.value || "",
     };
   });
@@ -95,15 +94,9 @@ chrome.runtime.onMessage.addListener((message) => {
     Object.entries(data).forEach(([key, value]) => {
       if (!value) return;
 
-      if (key.startsWith("christine")) {
-        console.log("we in here")
-      }
-
       const ele =
         reduceSelector(`#${CSS.escape(key)}`) ||
-        reduceSelector(`[name="${key}"]`) ||
-        reduceSelector(`[id*="${key}"]`) ||
-        reduceSelector(`[class*="${key}"]`)
+        reduceSelector(`[id*="${key}"]`)
 
       if (!ele) {
         console.warn("no key found for", key);

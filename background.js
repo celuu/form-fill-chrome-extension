@@ -78,7 +78,6 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
           requestBody.response_format = { type: "json_object" };
         }
 
-
         const response = await fetch(
           "https://api.openai.com/v1/chat/completions",
           {
